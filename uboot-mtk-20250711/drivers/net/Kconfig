@@ -126,7 +126,7 @@ config AIROHA_ETH
 	depends on ARCH_AIROHA
 	select PHYLIB
 	select DM_RESET
-	select MDIO_MT7531
+	select MDIO_MT7531_MMIO
 	help
 	  This Driver support Airoha Ethernet QDMA Driver
 	  Say Y to enable support for the Airoha Ethernet QDMA.
