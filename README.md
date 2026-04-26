@@ -381,6 +381,51 @@ It may cause some issues if you don't know what you are doing, so it's recommend
 
 ---
 
+## Airoha
+
+**It only for development and testing, not recommended for production use.**
+
+In canary status, please report any issues you encounter.
+
+**Warnign: Flashing custom bootloaders can brick your device. Proceed with caution and at your own risk.**
+
+### Step
+
+```bash
+sudo apt install gcc-arm-linux-gnueabi # if you need to build for en7523 devices
+```
+
+```bash
+cd atf/tools/fiptool
+sudo make all
+```
+
+```bash
+chmod +x airoha.sh
+./airoha.sh
+```
+
+You can specify the SOC and the BOARD, for example:
+
+```bash
+SOC=an7581 BOARD=evb ./airoha.sh
+```
+
+### About airoha
+
+They all not open source the ATF, so I used the binary BL2 and bl31 from the OEM or OpenWrt.
+
+| platform | soruce | description |
+| --- | --- | --- |
+| en7523 | OEM | Built jan 30 2021 V2.3, V7_3_267_150_verify_20210126_v024-2-g3b3e35d-dirty |
+| an7552 | OEM | Built feb 20 2024 V2.3, 50866bc |
+| an7581 | OpenWrt | Built may 21 2025 v2.10.0, release-openwrt v0~v2.10.0.1 (bl21-an7581) |
+| an7583 | OpenWrt | Built may 21 2025 v2.10.0, release-openwrt v0~v2.10.0.1 (bl21-an7583) |
+
+The drivers for airoha is not complete, so some features may not work!
+
+---
+
 ## Acknowledgement
 
 - [u-boot](https://github.com/u-boot/u-boot)
