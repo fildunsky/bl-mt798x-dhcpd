@@ -1,0 +1,253 @@
+// SPDX-License-Identifier: (GPL-2.0-only OR BSD-2-Clause)
+
+#include <dt-bindings/interrupt-controller/irq.h>
+#include <dt-bindings/interrupt-controller/arm-gic.h>
+#include <dt-bindings/gpio/gpio.h>
+#include <dt-bindings/clock/en7523-clk.h>
+
+/ {
+	interrupt-parent = <&gic>;
+	#address-cells = <1>;
+	#size-cells = <1>;
+
+	reserved-memory {
+		#address-cells = <1>;
+		#size-cells = <1>;
+		ranges;
+
+		ramoops: ramoops@83f00000{
+			no-map;
+			reg = <0x83fe0000 0x20000>;
+			record-size = <0x4000>;
+			console-size = <0x4000>;
+			pmsg-size = <0x4000>;
+		};
+
+		npu_reserved: npu_binary@84000000 {
+			no-map;
+			reg = <0x84000000 0x100000>;
+		};
+	};
+
+	cpu_opp_table: opp-table {
+		compatible = "operating-points-v2";
+		opp-shared;
+
+		opp-500000000 {
+			opp-hz = /bits/ 64 <500000000>;
+		};
+
+		opp-550000000 {
+			opp-hz = /bits/ 64 <550000000>;
+		};
+
+		opp-600000000 {
+			opp-hz = /bits/ 64 <600000000>;
+		};
+
+		opp-650000000 {
+			opp-hz = /bits/ 64 <650000000>;
+		};
+
+		opp-7000000000 {
+			opp-hz = /bits/ 64 <700000000>;
+		};
+		
+		opp-7500000000 {
+			opp-hz = /bits/ 64 <750000000>;
+		};		
+		
+		opp-8000000000 {
+			opp-hz = /bits/ 64 <800000000>;
+		};		
+		
+		opp-8500000000 {
+			opp-hz = /bits/ 64 <850000000>;
+		};	
+
+		opp-9000000000 {
+			opp-hz = /bits/ 64 <900000000>;
+		};		
+		
+		opp-9500000000 {
+			opp-hz = /bits/ 64 <950000000>;
+		};		
+
+		opp-10000000000 {
+			opp-hz = /bits/ 64 <1000000000>;
+		};
+
+	};
+
+	psci {
+		compatible = "arm,psci-0.2";
+		method = "smc";
+	};
+
+	cpus {
+		#address-cells = <1>;
+		#size-cells = <0>;
+
+		cpu-map {
+			cluster0 {
+				core0 {
+					cpu = <&cpu0>;
+				};
+				core1 {
+					cpu = <&cpu1>;
+				};
+			};
+		};
+
+		cpu0: cpu@0 {
+			device_type = "cpu";
+			compatible = "arm,cortex-a53";
+			reg = <0x0>;
+			operating-points-v2 = <&cpu_opp_table>;			
+			enable-method = "psci";
+			clock-frequency = <80000000>;
+			next-level-cache = <&L2_0>;
+			#cooling-cells = <2>;
+		};
+
+		cpu1: cpu@1 {
+			device_type = "cpu";
+			compatible = "arm,cortex-a53";
+			reg = <0x1>;
+			operating-points-v2 = <&cpu_opp_table>;			
+			enable-method = "psci";
+			clock-frequency = <80000000>;
+			next-level-cache = <&L2_0>;
+			#cooling-cells = <2>;
+		};
+
+		L2_0: l2-cache0 {
+			compatible = "cache";
+		};
+	};
+
+	gic: interrupt-controller@09000000 {
+		compatible = "arm,gic-v3";
+		interrupt-controller;
+		#interrupt-cells = <3>;
+		#address-cells = <1>;
+		#size-cells = <1>;
+		reg = <0x09000000 0x20000>,
+			  <0x09080000 0x80000>;
+		interrupts = <GIC_PPI 9 IRQ_TYPE_LEVEL_LOW>;
+
+		its: gic-its@09020000 {
+			compatible = "arm,gic-v3-its";
+			msi-controller;
+			#msi-cell = <1>;
+			reg = <0x090200000 0x20000>;
+		};
+	};
+
+	timer {
+		compatible = "arm,armv8-timer";
+		interrupt-parent = <&gic>;
+		interrupts = <GIC_PPI 13 (GIC_CPU_MASK_SIMPLE(4) | IRQ_TYPE_LEVEL_LOW)>,
+			     <GIC_PPI 14 (GIC_CPU_MASK_SIMPLE(4) | IRQ_TYPE_LEVEL_LOW)>,
+			     <GIC_PPI 11 (GIC_CPU_MASK_SIMPLE(4) | IRQ_TYPE_LEVEL_LOW)>,
+			     <GIC_PPI 10 (GIC_CPU_MASK_SIMPLE(4) | IRQ_TYPE_LEVEL_LOW)>;
+		clock-frequency = <25000000>;
+	};
+
+	pmu {
+		//compatible = "arm,armv8-pmuv3";
+		compatible = "arm,cortex-a15-pmu";
+		interrupts = <GIC_PPI 7 IRQ_TYPE_LEVEL_HIGH>;
+	};
+
+	memory@80000000 {
+		device_type = "memory";
+		reg = <0x80000000 0x40000000>;
+	};
+
+	scu: system-controller@1fb00000 {
+		compatible = "airoha,en7523-scu";
+		reg = <0x1fb00000 0x960>,			//NP SCU
+			  <0x1fa20000 0x360>,			//CHIP SCU
+			  <0x1fa2FF30 0x10>;			//Rbus clk ctl for FPGA
+				interrupts = <GIC_SPI 47 IRQ_TYPE_LEVEL_HIGH>;			  
+	};
+
+	pcie0: pcie@1fa91000 {
+	    device_type = "pci";
+		compatible = "airoha,en7523-pcie", "mediatek,mt7622-pcie";
+		reg = <0x1fa90000 0x2000>;
+		reg-names = "pcie-mac";
+	    #address-cells = <3>;
+	    #size-cells = <2>;
+		interrupts = <GIC_SPI 39 IRQ_TYPE_LEVEL_HIGH>,  //23+16
+			     <GIC_SPI 211 IRQ_TYPE_LEVEL_HIGH>;  //195+16
+		bus-range = <0x00 0xff>;
+		ranges = <0x82000000 0 0x20000000  0x20000000  0 0x4000000>;
+	    #interrupt-cells = <1>;
+	    interrupt-map-mask = <0 0 0 7>;
+	    interrupt-map = <0 0 0 1 &pcie_intc0 1>,
+			    		        <0 0 0 2 &pcie_intc0 2>,
+					            <0 0 0 3 &pcie_intc0 3>,
+					            <0 0 0 4 &pcie_intc0 4>;
+
+	    pcie_intc0: interrupt-controller {
+	          	      interrupt-controller;
+				            #address-cells = <0>;
+				            #interrupt-cells = <1>;
+			            };
+	  };
+
+	pcie1: pcie@1fa92000 {
+			device_type = "pci";
+		compatible = "airoha,en7523-pcie", "mediatek,mt7622-pcie";
+		reg = <0x1fa92000 0x1000>;
+		reg-names = "pcie-mac";
+			#address-cells = <3>;
+		interrupts = <GIC_SPI 40 IRQ_TYPE_LEVEL_HIGH>,  //24+16
+			     <GIC_SPI 212 IRQ_TYPE_LEVEL_HIGH>;  //196+16
+		bus-range = <0x00 0xff>;
+		ranges = <0x82000000 0 0x24000000  0x24000000  0 0x4000000>;
+			#interrupt-cells = <1>;
+			interrupt-map-mask = <0 0 0 7>;
+			interrupt-map = <0 0 0 1 &pcie_intc1 1>,
+			            		<0 0 0 2 &pcie_intc1 2>,
+					            <0 0 0 3 &pcie_intc1 3>,
+					            <0 0 0 4 &pcie_intc1 4>;
+
+			pcie_intc1: interrupt-controller {
+				            interrupt-controller;
+				            #address-cells = <0>;
+				            #interrupt-cells = <1>;
+			            };
+		}; 
+
+	gpio0: gpio@1fbf0200 {
+		compatible = "airoha,en7523-gpio";
+		reg = <0x1fbf0204 0x4>,
+		      <0x1fbf0200 0x4>,
+		      <0x1fbf0220 0x4>,
+		      <0x1fbf0214 0x4>;
+		gpio-controller;
+		#gpio-cells = <2>;
+	};
+
+	gpio1: gpio@1fbf0270 {
+		compatible = "airoha,en7523-gpio";
+		reg = <0x1fbf0270 0x4>,
+		      <0x1fbf0260 0x4>,
+		      <0x1fbf0264 0x4>,
+		      <0x1fbf0278 0x4>;
+		gpio-controller;
+		#gpio-cells = <2>;
+	};
+
+    uart2: serial@1fbf0300 {
+        compatible = "ns16550";
+        reg = <0x1fbf0300 0x30>,
+			<0x1fbe1000 0x40>;
+        interrupts = <GIC_SPI 32 IRQ_TYPE_LEVEL_HIGH>,
+				   <GIC_SPI 54 IRQ_TYPE_LEVEL_HIGH>;
+        //status = "disabled";
+    };
+};

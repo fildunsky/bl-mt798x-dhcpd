@@ -17,6 +17,17 @@ config TARGET_EN7523
 	  With advanced hardware design, EN7523 provides high processing
 	  performance and low power consumption.
 
+config TARGET_AN7552
+	bool "Airoha AN7552 SoC"
+	select CPU_V7A
+	select ARMV7_SET_CORTEX_SMPEN
+	help
+	  The Airoha AN7552 family (an7552/an7563) is an ARM-based
+	  SoCs with a dual-core CPU. It comes with Wi-Fi 7 support and
+	  connectivity to Ethernet PHY, DDR, PCIe, USB, UART and VoIP.
+	  With advanced hardware design, AN7552 provides high processing
+	  performance and low power consumption.
+
 config TARGET_AN7581
 	bool "Airoha AN7581 SoC"
 	select ARM64
@@ -43,16 +54,19 @@ endchoice
 
 config SYS_SOC
 	default "en7523" if TARGET_EN7523
+	default "an7552" if TARGET_AN7552
 	default "an7581" if TARGET_AN7581
 	default "an7583" if TARGET_AN7583
 
 config SYS_BOARD
 	default "en7523" if TARGET_EN7523
+	default "an7552" if TARGET_AN7552
 	default "an7581" if TARGET_AN7581
 	default "an7583" if TARGET_AN7583
 
 config SYS_CONFIG_NAME
 	default "en7523" if TARGET_EN7523
+	default "an7552" if TARGET_AN7552
 	default "an7581" if TARGET_AN7581
 	default "an7583" if TARGET_AN7583
 
