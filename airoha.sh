@@ -5,7 +5,8 @@
 
 # Auto-selected by SOC below unless TOOLCHAIN is explicitly provided
 TOOLCHAIN=${TOOLCHAIN:-}
-LZMA_COMPRESS=${LZMA_COMPRESS:-0}
+LZMA_COMPRESS=${LZMA_COMPRESS:-1}
+TYPE=${TYPE:-auto}
 VERSION=${VERSION:-2025}
 LOCAL_FIPTOOL=/tools/fiptool/fiptool
 
@@ -45,15 +46,28 @@ lzma_compress()
 if [ "$VERSION" = "2025" ]; then
     UBOOT_DIR=uboot-mtk-20250711
 else
-    die "Unsupported VERSION. Please specify VERSION=2026."
+    die "Unsupported VERSION. Please specify VERSION=2025."
 fi
 
 if [ -z "$SOC" ] || [ -z "$BOARD" ]; then
-	echo "Usage: SOC=<en7523|an7552|an7581|an7583> BOARD=<evb|w1700k> VERSION=2026 $0"
+	echo "Usage: SOC=<en7523|an7552|an7581|an7583> BOARD=<evb|w1700k> TYPE=<auto|FIP|BIN> VERSION=2025 $0"
 	echo "eg: SOC=en7523 BOARD=evb $0"
-	echo "eg: SOC=an7581 BOARD=evb VERSION=2026 $0"
+	echo "eg: SOC=en7523 BOARD=evb TYPE=FIP $0"
+	echo "eg: SOC=an7581 BOARD=evb TYPE=BIN VERSION=2025 $0"
+	echo "eg: SOC=an7581 BOARD=evb VERSION=2025 $0"
 	exit 1
 fi
+
+# TYPE can be forced, otherwise it follows the Makefile-style default per target.
+TYPE_NORM=$(printf '%s' "$TYPE" | tr '[:upper:]' '[:lower:]')
+
+case "$TYPE_NORM" in
+	auto|fip|bin)
+		;;
+	*)
+		die "Unsupported TYPE '$TYPE'. Please use auto, FIP, or BIN."
+		;;
+esac
 
 # Airoha platform target mapping (aligned with OpenWrt Makefile behavior)
 case "${SOC}_${BOARD}" in
@@ -62,7 +76,7 @@ case "${SOC}_${BOARD}" in
 	an7581_evb |\
 	an7583_evb)
 		UBOOT_CFG="${SOC}_${BOARD}_defconfig"
-		UBOOT_IMAGE="u-boot.fip"
+		DEFAULT_TYPE="fip"
 		BL2_IMAGE="${SOC}-bl2.bin"
 		BL31_IMAGE="${SOC}-bl31.bin"
 		BL_SOC_DIR="${SOC}"
@@ -70,11 +84,23 @@ case "${SOC}_${BOARD}" in
 		;;
 	*)
 		UBOOT_CFG="${SOC}_${BOARD}_defconfig"
-		UBOOT_IMAGE="u-boot.bin"
+		DEFAULT_TYPE="bin"
 		BL_SOC_DIR="${SOC}"
 		OUTPUT_PREFIX="${SOC}-u-boot-${BOARD}-${VERSION}"
 		;;
 esac
+
+if [ "$TYPE_NORM" = "auto" ]; then
+	BUILD_TYPE="$DEFAULT_TYPE"
+else
+	BUILD_TYPE="$TYPE_NORM"
+fi
+
+if [ "$BUILD_TYPE" = "fip" ]; then
+	UBOOT_IMAGE="u-boot.fip"
+else
+	UBOOT_IMAGE="u-boot.bin"
+fi
 
 # Auto-select cross toolchain by SOC when TOOLCHAIN is not provided
 if [ -z "$TOOLCHAIN" ]; then
@@ -135,6 +161,8 @@ echo "======================================================================"
 echo "VERSION: $VERSION"
 echo "SOC: $SOC"
 echo "BOARD: $BOARD"
+echo "TYPE: $TYPE"
+echo "Build Type: $BUILD_TYPE"
 echo "U-Boot Dir: $UBOOT_DIR"
 echo "U-Boot Config: $UBOOT_CFG"
 echo "U-Boot Image: $UBOOT_IMAGE"
@@ -153,6 +181,8 @@ if [ ! -f "$UBOOT_DIR/configs/$UBOOT_CFG" ]; then
 fi
 
 if [ "$UBOOT_IMAGE" = "u-boot.fip" ]; then
+	[ -n "$BL2_IMAGE" ] || die "TYPE=fip is not supported for ${SOC}_${BOARD}"
+	[ -n "$BL31_IMAGE" ] || die "TYPE=fip is not supported for ${SOC}_${BOARD}"
 	BL2_PATH="$UBOOT_DIR/board/airoha/$BL_SOC_DIR/$BL2_IMAGE"
 	BL31_PATH="$UBOOT_DIR/board/airoha/$BL_SOC_DIR/$BL31_IMAGE"
 	[ -f "$BL2_PATH" ] || die "BL2 image not found: $BL2_PATH"
