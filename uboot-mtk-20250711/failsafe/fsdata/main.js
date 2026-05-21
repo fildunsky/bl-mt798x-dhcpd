@@ -595,9 +595,9 @@ function ajax(request) {
     xhr.send(request.data);
 }
 
-/* consoleInit moved to console.js */
+/* consoleInit moved to console_js.js */
 
-/* envInit moved to env.js */
+/* envInit moved to env_js.js */
 
 function appInit(pageName) {
     APP_STATE.page = pageName || "";
@@ -1002,9 +1002,9 @@ function parseUserLen(input) {
     return null;
 }
 
-/* flash logic moved to flash.js */
+/* flash logic moved to flash_js.js */
 
-/* backup logic moved to backup.js */
+/* backup logic moved to backup_js.js */
 
 APP_STATE = {
     lang: "en",

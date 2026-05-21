@@ -78,32 +78,32 @@ FILE_style.o := style.css
 FSPATH_style.o := style.css
 
 obj-$(CONFIG_WEBUI_FAILSAFE_BACKUP) += backup_js.o
-FILE_backup_js.o := backup.js
-FSPATH_backup_js.o := backup.js
+FILE_backup_js.o := backup_js.js
+FSPATH_backup_js.o := backup_js.js
 
 obj-$(CONFIG_WEBUI_FAILSAFE_CONSOLE) += console_js.o
-FILE_console_js.o := console.js
-FSPATH_console_js.o := console.js
+FILE_console_js.o := console_js.js
+FSPATH_console_js.o := console_js.js
 
 obj-$(CONFIG_WEBUI_FAILSAFE_ENV) += env_js.o
-FILE_env_js.o := env.js
-FSPATH_env_js.o := env.js
+FILE_env_js.o := env_js.js
+FSPATH_env_js.o := env_js.js
 
 obj-$(CONFIG_WEBUI_FAILSAFE_FLASH) += flash_js.o
-FILE_flash_js.o := flash.js
-FSPATH_flash_js.o := flash.js
+FILE_flash_js.o := flash_js.js
+FSPATH_flash_js.o := flash_js.js
 
-obj-$(CONFIG_WEBUI_FAILSAFE_I18N) += i18n_js.o
-FILE_i18n_js.o := i18n.js
-FSPATH_i18n_js.o := i18n.js
+obj-$(CONFIG_WEBUI_FAILSAFE_I18N) += i18n.o
+FILE_i18n.o := i18n.js
+FSPATH_i18n.o := i18n.js
 
-obj-y += main_js.o
-FILE_main_js.o := main.js
-FSPATH_main_js.o := main.js
+obj-y += main.o
+FILE_main.o := main.js
+FSPATH_main.o := main.js
 
-obj-y += themeloader_js.o
-FILE_themeloader_js.o := themeloader.js
-FSPATH_themeloader_js.o := themeloader.js
+obj-y += theme.o
+FILE_theme.o := theme.js
+FSPATH_theme.o := theme.js
 
 # customized build rules
 strip_path = $(subst /,_,$(subst -,_,$(subst .,_,$(1))))

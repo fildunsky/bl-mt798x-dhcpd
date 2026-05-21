@@ -863,11 +863,11 @@ static const char *select_js_file(const char *uri)
 	static const char *allowed[] = {
 		"main.js",
 		"i18n.js",
-		"themeloader.js",
-		"backup.js",
-		"console.js",
-		"env.js",
-		"flash.js",
+		"theme.js",
+		"backup_js.js",
+		"console_js.js",
+		"env_js.js",
+		"flash_js.js",
 		NULL
 	};
 	const char *basename;
@@ -1020,22 +1020,18 @@ int start_web_failsafe(void)
 	httpd_register_uri_handler(inst, "/reboot-failsafe", &reboot_failsafe_handler, NULL);
 	httpd_register_uri_handler(inst, "/reboot.html", &html_handler, NULL);
 	httpd_register_uri_handler(inst, "/sysinfo", &sysinfo_handler, NULL);
-#ifdef CONFIG_WEBUI_FAILSAFE_UI_NEW
-	httpd_register_uri_handler(inst, "/favicon.svg", &picture_handler, NULL);
-	httpd_register_uri_handler(inst, "/themeloader.js", &js_handler, NULL);
-#endif
 #ifdef CONFIG_WEBUI_FAILSAFE_I18N
 	httpd_register_uri_handler(inst, "/i18n.js", &js_handler, NULL);
 #endif
 #ifdef CONFIG_WEBUI_FAILSAFE_BACKUP
 	httpd_register_uri_handler(inst, "/backup.html", &html_handler, NULL);
-	httpd_register_uri_handler(inst, "/backup.js", &js_handler, NULL);
+	httpd_register_uri_handler(inst, "/backup_js.js", &js_handler, NULL);
 	httpd_register_uri_handler(inst, "/backup/info", &backupinfo_handler, NULL);
 	httpd_register_uri_handler(inst, "/backup/main", &backup_handler, NULL);
 #endif
 #ifdef CONFIG_WEBUI_FAILSAFE_FLASH
 	httpd_register_uri_handler(inst, "/flash.html", &html_handler, NULL);
-	httpd_register_uri_handler(inst, "/flash.js", &js_handler, NULL);
+	httpd_register_uri_handler(inst, "/flash_js.js", &js_handler, NULL);
 	httpd_register_uri_handler(inst, "/flash/read", &flash_handler, NULL);
 	httpd_register_uri_handler(inst, "/flash/write", &flash_handler, NULL);
 	httpd_register_uri_handler(inst, "/flash/erase", &flash_handler, NULL);
@@ -1043,16 +1039,18 @@ int start_web_failsafe(void)
 #endif
 #ifdef CONFIG_WEBUI_FAILSAFE_ENV
 	httpd_register_uri_handler(inst, "/env.html", &html_handler, NULL);
-	httpd_register_uri_handler(inst, "/env.js", &js_handler, NULL);
+	httpd_register_uri_handler(inst, "/env_js.js", &js_handler, NULL);
 	httpd_register_uri_handler(inst, "/env/list", &env_list_handler, NULL);
 	httpd_register_uri_handler(inst, "/env/set", &env_set_handler, NULL);
 	httpd_register_uri_handler(inst, "/env/unset", &env_unset_handler, NULL);
 	httpd_register_uri_handler(inst, "/env/reset", &env_reset_handler, NULL);
 	httpd_register_uri_handler(inst, "/env/restore", &env_restore_handler, NULL);
+#endif
 #ifdef CONFIG_WEBUI_FAILSAFE_UI_NEW
+	httpd_register_uri_handler(inst, "/favicon.svg", &picture_handler, NULL);
+	httpd_register_uri_handler(inst, "/theme.js", &js_handler, NULL);
 	httpd_register_uri_handler(inst, "/theme/get", &theme_get_handler, NULL);
 	httpd_register_uri_handler(inst, "/theme/set", &theme_set_handler, NULL);
-#endif
 #endif
 #ifdef CONFIG_WEBUI_FAILSAFE_SIMG
 	httpd_register_uri_handler(inst, "/simg.html", &html_handler, NULL);
@@ -1064,7 +1062,7 @@ int start_web_failsafe(void)
 	/* Enable recording early so we can stream output to the browser */
 	failsafe_webconsole_ensure_recording();
 	httpd_register_uri_handler(inst, "/console.html", &html_handler, NULL);
-	httpd_register_uri_handler(inst, "/console.js", &js_handler, NULL);
+	httpd_register_uri_handler(inst, "/console_js.js", &js_handler, NULL);
 	httpd_register_uri_handler(inst, "/console/poll", &webconsole_poll_handler, NULL);
 	httpd_register_uri_handler(inst, "/console/exec", &webconsole_exec_handler, NULL);
 	httpd_register_uri_handler(inst, "/console/clear", &webconsole_clear_handler, NULL);
