@@ -64,13 +64,30 @@
 
 						<section class="settings-section" id="set_mtd_section" style="display:none;">
 							<h2 class="settings-heading" data-i18n="settings.section.storage">Storage</h2>
-							<div class="form-row">
+							<div class="form-row form-row-2">
 								<div class="field">
 									<label for="set_mtd_layout" data-i18n="settings.storage.mtd_layout">MTD layout:</label>
 									<select id="set_mtd_layout" class="field-control" data-env="mtd_layout"></select>
 								</div>
+								<div class="field">
+									<label for="set_mtdparts_fixed" data-i18n="settings.storage.fixed">Fixed mtdparts (mtdparts_fixed):</label>
+									<select id="set_mtdparts_fixed" class="field-control" data-env="mtdparts_fixed" data-type="bool">
+										<option value="" data-i18n="settings.value.default">Default</option>
+										<option value="1" data-i18n="settings.value.on">On</option>
+										<option value="0" data-i18n="settings.value.off">Off</option>
+									</select>
+								</div>
 							</div>
-							<p class="settings-help" data-i18n="settings.storage.help">Pick a partition layout exposed by the device tree. Empty keeps the current layout.</p>
+							<div class="form-row" id="set_mtd_custom_row" style="display:none;">
+								<div class="field">
+									<label for="set_mtd_custom" data-i18n="settings.storage.mtd_custom">Custom mtdparts (mtd_layout_custom):</label>
+									<input id="set_mtd_custom" class="field-control" type="text"
+										data-env="mtd_layout_custom"
+										autocomplete="off" autocapitalize="off" autocorrect="off" spellcheck="false"
+										placeholder="nmbm0:1024k(bl2),512k(u-boot-env),2048k(Factory),2048k(fip),-(ubi)">
+								</div>
+							</div>
+							<p class="settings-help" data-i18n="settings.storage.help">Pick a partition layout exposed by the device tree. Choose "custom" to provide your own mtdparts string. Fixed mtdparts forces regeneration on every boot.</p>
 						</section>
 
 						<section class="settings-section">

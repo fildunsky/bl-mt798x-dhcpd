@@ -15,6 +15,8 @@
     const ACCENT_HOST_ID = "settings_accent_host";
     const MTD_SECTION_ID = "set_mtd_section";
     const MTD_SELECT_ID = "set_mtd_layout";
+    const MTD_CUSTOM_ROW_ID = "set_mtd_custom_row";
+    const MTD_CUSTOM_LABEL = "custom";
 
     let lastEnvSnapshot = {};
 
@@ -55,6 +57,20 @@
         return snapshot;
     }
 
+    function syncMtdCustomVisibility() {
+        const select = document.getElementById(MTD_SELECT_ID);
+        const row = document.getElementById(MTD_CUSTOM_ROW_ID);
+        if (!select || !row) return;
+        row.style.display = select.value === MTD_CUSTOM_LABEL ? "" : "none";
+    }
+
+    function bindMtdLayoutChange() {
+        const select = document.getElementById(MTD_SELECT_ID);
+        if (!select || select.dataset.mtdbound === "1") return;
+        select.dataset.mtdbound = "1";
+        select.addEventListener("change", syncMtdCustomVisibility);
+    }
+
     async function populateMtdLayouts() {
         const select = document.getElementById(MTD_SELECT_ID);
         const section = document.getElementById(MTD_SECTION_ID);
@@ -69,7 +85,7 @@
         if (!text || text === "error") return;
 
         const parts = text.split(";").filter((s) => s.length > 0);
-        if (parts.length < 2) return;
+        if (parts.length < 1) return;
 
         const previousValue = select.value;
         select.options.length = 0;
@@ -79,8 +95,11 @@
         blank.textContent = t("settings.value.default", "Default");
         select.appendChild(blank);
 
-        for (let i = 1; i < parts.length; i++) {
-            const name = parts[i];
+        const labels = parts.slice(1);
+        if (!labels.includes(MTD_CUSTOM_LABEL))
+            labels.push(MTD_CUSTOM_LABEL);
+
+        for (const name of labels) {
             const opt = document.createElement("option");
             opt.value = name;
             opt.textContent = name;
@@ -89,6 +108,8 @@
 
         if (previousValue) select.value = previousValue;
         if (section) section.style.display = "";
+
+        syncMtdCustomVisibility();
     }
 
     function buildAccentControls() {
@@ -191,6 +212,7 @@
             const envMap = parseEnvList(text);
             applyCurrentValues(envMap);
             lastEnvSnapshot = snapshotCurrentValues();
+            syncMtdCustomVisibility();
             setStatus(t("env.status.ready", "Ready."));
         } catch (error) {
             setStatus(t("env.status.error", "Error:") + " " +
@@ -264,6 +286,7 @@
         buildAccentControls();
         bindDarkVariantControl();
         bindNetworkSync();
+        bindMtdLayoutChange();
         populateMtdLayouts();
         refresh();
     }
