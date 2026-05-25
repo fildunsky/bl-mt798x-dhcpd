@@ -42,3 +42,4 @@ migration*.py
 
 # Toolchain
 openwrt-toolchain*
+node_modules/
