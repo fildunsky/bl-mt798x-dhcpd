@@ -29,9 +29,9 @@ on:
         default: '2025'
         type: choice
         options:
-          - '2024'
           - '2025'
-          - '2026'
+          - 'SP1'
+          - 'SP2'
       ATF_OC:
         description: 'Include mt7981/mt7986 OC profiles'
         required: false

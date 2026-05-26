@@ -21,10 +21,8 @@ Staging="${Staging%/toolchain-*}"
 
 if [ "$VERSION" = "2025" ]; then
     UBOOT_DIR=uboot-mtk-20250711
-elif [ "$VERSION" = "2026" ]; then
-    UBOOT_DIR=uboot-mtk-20260123
 else
-    echo "Error: Unsupported VERSION. Please specify VERSION=2025/2026."
+    echo "Error: Unsupported VERSION. Please specify VERSION=2025."
     exit 1
 fi
 

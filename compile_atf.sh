@@ -10,18 +10,14 @@ OUTPUT_DIR="${OUTPUT_DIR:-output_bl2}"
 VERSION=${VERSION:-2025}
 
 if [ -z "$ATF_DIR" ]; then
-    if [ "$VERSION" = "2022" ]; then
-        ATF_DIR=atf-20220606-637ba581b
-    elif [ "$VERSION" = "2023" ]; then
-        ATF_DIR=atf-20231013-0ea67d76a
-    elif [ "$VERSION" = "2024" ]; then
-        ATF_DIR=atf-20240117-bacca82a8
-    elif [ "$VERSION" = "2025" ]; then
+    if [ "$VERSION" = "2025" ]; then
         ATF_DIR=atf-20250711
-    elif [ "$VERSION" = "2026" ]; then
+    elif [ "$VERSION" = "SP1" ] || [ "$VERSION" = "sp1" ]; then
+        ATF_DIR=atf-20240117-bacca82a8
+    elif [ "$VERSION" = "SP2" ] || [ "$VERSION" = "sp2" ]; then
         ATF_DIR=atf-20260123
     else
-        echo "Error: Unsupported VERSION. Please specify VERSION=2025/2026 or set ATF_DIR."
+        echo "Error: Unsupported VERSION. Please specify VERSION=2025/SP1/SP2 or set ATF_DIR."
         exit 1
     fi
 fi
@@ -178,7 +174,7 @@ for cfg_file in $CONFIG_LIST; do
     echo "Build ATF with config: $cfg_name"
     echo "======================================================================"
     build_ok=1
-    if [ "$VERSION" = "2025" ] || [ "$VERSION" = "2026" ]; then
+    if [ "$VERSION" = "2025" ] || [ "$VERSION" = "SP1" ] || [ "$VERSION" = "SP2" ]; then
         make -C "$ATF_DIR" olddefconfig || build_ok=0
     else
         make -C "$ATF_DIR" defconfig || build_ok=0

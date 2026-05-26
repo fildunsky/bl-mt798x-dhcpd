@@ -6,18 +6,14 @@ output_folder="./output_gpt"
 
 VERSION=${VERSION:-2025}
 
-if [ "$VERSION" = "2022" ]; then
-    tools_folder="./atf-20220606-637ba581b/tools/dev/gpt_editor"
-elif [ "$VERSION" = "2023" ]; then
-    tools_folder="./atf-20231013-0ea67d76a/tools/dev/gpt_editor"
-elif [ "$VERSION" = "2024" ]; then
-    tools_folder="./atf-20240117-bacca82a8/tools/dev/gpt_editor"
-elif [ "$VERSION" = "2025" ]; then
+if [ "$VERSION" = "2025" ]; then
     tools_folder="./atf-20250711/tools/dev/gpt_editor"
-elif [ "$VERSION" = "2026" ]; then
+elif [ "$VERSION" = "SP1" ] || [ "$VERSION" = "sp1" ]; then
+    tools_folder="./atf-20240117-bacca82a8/tools/dev/gpt_editor"
+elif [ "$VERSION" = "SP2" ] || [ "$VERSION" = "sp2" ]; then
     tools_folder="./atf-20260123/tools/dev/gpt_editor"
 else
-    echo "Error: Unsupported VERSION. Please specify VERSION=2022/2023/2024/2025/2026."
+    echo "Error: Unsupported VERSION. Please specify VERSION=2025/SP1/SP2."
     exit 1
 fi
 

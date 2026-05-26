@@ -28,10 +28,10 @@ VERSION=${VERSION:-2025}
 if [ -z "${ATF_DIR:-}" ]; then
     if [ "$VERSION" = "2025" ]; then
         ATF_DIR="atf-20250711"
-    elif [ "$VERSION" = "2026" ]; then
+    elif [ "$VERSION" = "SP2" ]; then
         ATF_DIR="atf-20260123"
     else
-        echo "Error: Unsupported VERSION. Please specify VERSION=2025/2026 or set ATF_DIR."
+        echo "Error: Unsupported VERSION. Please specify VERSION=2025/SP2 or set ATF_DIR."
         exit 1
     fi
 fi
