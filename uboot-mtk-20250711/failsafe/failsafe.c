@@ -71,6 +71,10 @@ int __weak failsafe_write_image(const void *data, size_t size, failsafe_fw_t fw)
 
 static bool services_auto_started;
 
+static void not_found_handler(enum httpd_uri_handler_status status,
+			      struct httpd_request *request,
+			      struct httpd_response *response);
+
 void schedule_hook(void)
 {
 	bool need_poll = failsafe_httpd_running;
@@ -260,9 +264,12 @@ static int output_plain_file(struct httpd_response *response,
 	if (file) {
 		response->data = file->data;
 		response->size = file->size;
+		/* embedded assets are gzip-compressed at build time */
+		response->info.content_encoding = "gzip";
 	} else {
 		response->data = "Error: file not found";
 		response->size = strlen(response->data);
+		response->info.content_encoding = NULL;
 		ret = 1;
 	}
 
@@ -645,8 +652,10 @@ static void index_handler(enum httpd_uri_handler_status status,
 			  struct httpd_request *request,
 			  struct httpd_response *response)
 {
-	if (status == HTTP_CB_NEW)
-		output_plain_file(response, "index.html");
+	if (status == HTTP_CB_NEW) {
+		if (output_plain_file(response, "index.html"))
+			not_found_handler(status, request, response);
+	}
 }
 
 static void upload_handler(enum httpd_uri_handler_status status,
@@ -881,7 +890,10 @@ static void style_handler(enum httpd_uri_handler_status status,
 			  struct httpd_response *response)
 {
 	if (status == HTTP_CB_NEW) {
-		output_plain_file(response, "style.css");
+		if (output_plain_file(response, "style.css")) {
+			not_found_handler(status, request, response);
+			return;
+		}
 		response->info.content_type = "text/css";
 	}
 }
@@ -947,7 +959,12 @@ static void js_handler(enum httpd_uri_handler_status status,
 		const char *uri = request && request->urih ? request->urih->uri : NULL;
 		const char *file = select_js_file(uri);
 
-		output_plain_file(response, file);
+		if (output_plain_file(response, file)) {
+			/* requested JS not embedded: serve 404 page instead of
+			 * a plain-text error masquerading as gzip-encoded JS */
+			not_found_handler(status, request, response);
+			return;
+		}
 		response->info.content_type = "text/javascript";
 	}
 }

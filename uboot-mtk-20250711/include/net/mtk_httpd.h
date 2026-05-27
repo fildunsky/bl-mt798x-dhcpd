@@ -56,6 +56,7 @@ struct http_response_info {
 	u32 code;
 	const char *content_type;
 	int content_length;
+	const char *content_encoding;
 	const char *location;
 	int connection_close;
 	int chunked_encoding;

@@ -179,10 +179,13 @@ static int output_binary_file(struct httpd_response *response,
 	if (file) {
 		response->data = file->data;
 		response->size = file->size;
+		/* embedded binary assets are gzip-compressed at build time */
+		response->info.content_encoding = "gzip";
 	} else {
 		response->data = "Not Found";
 		response->size = strlen(response->data);
 		response->info.code = 404;
+		response->info.content_encoding = NULL;
 		ret = 1;
 	}
 

@@ -279,6 +279,13 @@ u32 http_make_response_header(struct http_response_info *info, char *buff,
 	if (p >= buff + size)
 		return size;
 
+	if (info->content_encoding)
+		p += snprintf(p, buff + size - p, "Content-Encoding: %s\r\n",
+			      info->content_encoding);
+
+	if (p >= buff + size)
+		return size;
+
 	if (info->content_length >= 0)
 		p += snprintf(p, buff + size - p, "Content-Length: %d\r\n",
 			      info->content_length);
