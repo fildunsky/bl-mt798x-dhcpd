@@ -1218,6 +1218,16 @@ int start_web_failsafe(void)
 		}
 	}
 
+	{
+		u32 ip = ntohl(net_ip.s_addr);
+
+		printf("\nWeb failsafe UI started\n");
+		printf("URL: http://%u.%u.%u.%u/\n",
+		       (ip >> 24) & 0xff, (ip >> 16) & 0xff,
+		       (ip >> 8) & 0xff, ip & 0xff);
+		printf("Press Ctrl+C to exit\n");
+	}
+
 	failsafe_httpd_running = true;
 	net_loop(MTK_TCP);
 	failsafe_httpd_running = false;
@@ -1228,7 +1238,6 @@ int start_web_failsafe(void)
 static int do_httpd(struct cmd_tbl *cmdtp, int flag, int argc,
 		    char *const argv[])
 {
-	u32 local_ip;
 	int ret;
 
 #ifdef CONFIG_NET_FORCE_IPADDR
@@ -1240,13 +1249,6 @@ static int do_httpd(struct cmd_tbl *cmdtp, int flag, int argc,
 		net_netmask = string_to_ip((env_nm && env_nm[0]) ? env_nm : CONFIG_NETMASK);
 	}
 #endif
-	local_ip = ntohl(net_ip.s_addr);
-
-	printf("\nWeb failsafe UI started\n");
-	printf("URL: http://%u.%u.%u.%u/\n",
-	       (local_ip >> 24) & 0xff, (local_ip >> 16) & 0xff,
-	       (local_ip >> 8) & 0xff, local_ip & 0xff);
-	printf("\nPress Ctrl+C to exit\n");
 
 	ret = start_web_failsafe();
 
