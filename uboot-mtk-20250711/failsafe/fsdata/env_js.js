@@ -14,6 +14,7 @@ function envInit() {
     const valueInput = document.getElementById("env_value");
     const statusElement = document.getElementById("env_status");
     const countElement = document.getElementById("env_count");
+    const sizeElement = document.getElementById("env_size");
     const fileInput = document.getElementById("env_file");
 
     function setStatus(message) {
@@ -30,6 +31,18 @@ function envInit() {
         return lineCount;
     }
 
+    async function updateEnvSize() {
+        try {
+            const response = await fetch("/env/size", { method: "GET" });
+            if (response.ok) {
+                const sizeText = await response.text();
+                sizeElement && (sizeElement.textContent = t("env.size") + " " + sizeText);
+            }
+        } catch (error) {
+            /* Ignore size fetch errors */
+        }
+    }
+
     window.envRefresh = async function () {
         try {
             setStatus(t("env.status.loading"));
@@ -42,6 +55,7 @@ function envInit() {
             listElement && (listElement.textContent = responseText || "");
             countElement && (countElement.textContent = t("env.count") + " " + countLines(responseText));
             setStatus(t("env.status.ready"));
+            updateEnvSize();
         } catch (error) {
             setStatus(t("env.status.error") + " " + (error && error.message ? error.message : String(error)));
         }

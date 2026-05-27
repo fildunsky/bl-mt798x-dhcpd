@@ -1168,6 +1168,7 @@ int start_web_failsafe(void)
 	httpd_register_uri_handler(inst, "/env/unset", &env_unset_handler, NULL);
 	httpd_register_uri_handler(inst, "/env/reset", &env_reset_handler, NULL);
 	httpd_register_uri_handler(inst, "/env/restore", &env_restore_handler, NULL);
+	httpd_register_uri_handler(inst, "/env/size", &env_size_handler, NULL);
 #endif
 #ifdef CONFIG_WEBUI_FAILSAFE_UI_BOOTSTRAP
 	httpd_register_uri_handler(inst, "/favicon.svg", &picture_handler, NULL);

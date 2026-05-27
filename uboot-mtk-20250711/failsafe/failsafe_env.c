@@ -415,3 +415,75 @@ void env_restore_handler(enum httpd_uri_handler_status status,
 
 	failsafe_http_reply_text(response, 200, "ok");
 }
+
+void env_size_handler(enum httpd_uri_handler_status status,
+	struct httpd_request *request,
+	struct httpd_response *response)
+{
+	env_t *envbuf;
+	char *out;
+	size_t used_size = 0;
+	size_t total_size = ENV_SIZE;
+	int ret;
+
+	if (status == HTTP_CB_CLOSED) {
+		failsafe_env_free_session(status, response);
+		return;
+	}
+
+	if (status != HTTP_CB_NEW)
+		return;
+
+	if (!request || request->method != HTTP_GET) {
+		failsafe_http_reply_text(response, 405, "method");
+		return;
+	}
+
+	envbuf = malloc(sizeof(*envbuf));
+	if (!envbuf) {
+		failsafe_http_reply_text(response, 500, "alloc failed");
+		return;
+	}
+
+	if (env_export(envbuf)) {
+		free(envbuf);
+		failsafe_http_reply_text(response, 500, "export failed");
+		return;
+	}
+
+	/* Calculate used size: find the end of environment data */
+	for (size_t i = 0; i < ENV_SIZE - 1; i++) {
+		if (!envbuf->data[i] && !envbuf->data[i + 1]) {
+			used_size = i + 2; /* Include the double null terminator */
+			break;
+		}
+	}
+
+	/* If we didn't find the end, the env is full */
+	if (used_size == 0)
+		used_size = ENV_SIZE;
+
+	free(envbuf);
+
+	/* Format response: "used/total bytes" */
+	out = malloc(64);
+	if (!out) {
+		failsafe_http_reply_text(response, 500, "alloc failed");
+		return;
+	}
+
+	ret = snprintf(out, 64, "%zu/%zu bytes", used_size, total_size);
+	if (ret < 0 || ret >= 64) {
+		free(out);
+		failsafe_http_reply_text(response, 500, "format failed");
+		return;
+	}
+
+	response->status = HTTP_RESP_STD;
+	response->data = out;
+	response->size = strlen(out);
+	response->info.code = 200;
+	response->info.connection_close = 1;
+	response->info.content_type = "text/plain";
+	response->session_data = out;
+}
